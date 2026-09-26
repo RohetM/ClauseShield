@@ -1,14 +1,14 @@
 "use client";
 
 import React from 'react';
-import { Printer, X, Download } from 'lucide-react';
-import { ClauseAnalysisResult } from '@/lib/types';
+import { Printer, X } from 'lucide-react';
+import { ClauseAnalysisResult, ContractAnalysisResponse } from '@/lib/validation/clauseSchema';
 
 interface LawyerDossierModalProps {
   isOpen: boolean;
   onClose: () => void;
   clauses: ClauseAnalysisResult[];
-  metadata: any;
+  metadata: Partial<ContractAnalysisResponse> | null;
 }
 
 export default function LawyerDossierModal({ isOpen, onClose, clauses, metadata }: LawyerDossierModalProps) {
@@ -90,8 +90,7 @@ export default function LawyerDossierModal({ isOpen, onClose, clauses, metadata 
                         <p className="text-sm text-gray-300 print:text-gray-800">{clause.plain_english_consequence}</p>
                       </div>
                       <div>
-                        <span className="block text-xs font-semibold text-gray-500 uppercase mb-1">Question for Attorney</span>
-                        <p className="text-sm text-blue-400 print:text-blue-700">"Does this {clause.category.toLowerCase()} clause legally bind me under local jurisdiction, and should we push for our counter-offer?"</p>
+                        <p className="text-sm text-blue-400 print:text-blue-700">&quot;Does this {clause.category.toLowerCase()} clause legally bind me under local jurisdiction, and should we push for our counter-offer?&quot;</p>
                       </div>
                     </div>
                   </div>

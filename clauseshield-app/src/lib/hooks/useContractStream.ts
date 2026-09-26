@@ -4,7 +4,7 @@ import { ClauseAnalysisResult, ContractAnalysisResponse } from '../validation/cl
 export function useContractStream() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [clauses, setClauses] = useState<ClauseAnalysisResult[]>([]);
-  const [metadata, setMetadata] = useState<any>(null);
+  const [metadata, setMetadata] = useState<Partial<ContractAnalysisResponse> | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const analyzeContract = useCallback(async (text: string) => {
@@ -23,7 +23,7 @@ export function useContractStream() {
       const data: ContractAnalysisResponse = await response.json();
 
       if (!response.ok) {
-        throw new Error((data as any).error || 'Failed to analyze contract');
+        throw new Error((data as unknown as {error?: string}).error || 'Failed to analyze contract');
       }
 
       if (!data.is_contractual) {
@@ -52,8 +52,8 @@ export function useContractStream() {
           setClauses(prev => [...prev, data.clauses![i]]);
         }
       }
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setIsAnalyzing(false);
     }

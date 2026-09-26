@@ -67,7 +67,7 @@ export default function Home() {
                 {['ALL', 'CRITICAL', 'ELEVATED', 'STANDARD'].map(tab => (
                   <button
                     key={tab}
-                    onClick={() => setActiveTab(tab as any)}
+                    onClick={() => setActiveTab(tab as 'ALL' | 'CRITICAL' | 'ELEVATED' | 'STANDARD')}
                     className={`px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider transition-colors ${
                       activeTab === tab 
                         ? 'bg-blue-600 text-white' 

@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
     // Validate Input
     const parseResult = AnalyzeRequestSchema.safeParse(body);
     if (!parseResult.success) {
-      return NextResponse.json({ error: parseResult.error.errors[0].message }, { status: 400 });
+      return NextResponse.json({ error: parseResult.error.issues[0].message }, { status: 400 });
     }
 
     const { text } = parseResult.data;
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     const analysisResult = await analyzeContractContent(sanitizedText);
 
     return NextResponse.json(analysisResult, { status: 200 });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Analysis route error:", err);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }

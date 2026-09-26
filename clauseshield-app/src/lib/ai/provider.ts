@@ -87,7 +87,7 @@ CRITICAL RULES:
     const parsed = JSON.parse(cleanJson);
     
     return ContractAnalysisResponseSchema.parse(parsed);
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (retryCount === 0) {
       console.warn("LLM parsing failed, retrying once...", error);
       return analyzeContractContent(text, 1);

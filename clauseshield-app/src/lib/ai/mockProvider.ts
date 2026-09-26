@@ -1,4 +1,4 @@
-import { ContractEvaluationResponse, ClauseAnalysisResult } from "../validation/clauseSchema";
+import { ClauseAnalysisResult } from "../validation/clauseSchema";
 import { scrubPII } from "../../features/analyzer/piiScrubber";
 
 export async function analyzeContractMock(text: string, onProgress: (chunk: string) => void): Promise<void> {
@@ -28,7 +28,7 @@ export async function analyzeContractMock(text: string, onProgress: (chunk: stri
   
   onProgress(JSON.stringify({ type: 'metadata', data: metadata }));
 
-  let clauses: ClauseAnalysisResult[] = [];
+  const clauses: ClauseAnalysisResult[] = [];
 
   // High-Attention Case
   if (lowerText.includes("or outside the contract period") || lowerText.includes("perpetual, worldwide")) {

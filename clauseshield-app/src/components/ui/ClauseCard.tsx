@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronUp, AlertCircle, Copy, Scale } from 'lucide-react';
-import { ClauseAnalysisResult } from '@/lib/types';
+import { ClauseAnalysisResult } from '@/lib/validation/clauseSchema';
 import MonacoDiffViewer from './MonacoDiffViewer';
 import { announce } from '@/lib/a11y-announcer';
 
@@ -112,9 +112,7 @@ export default function ClauseCard({ clause }: ClauseCardProps) {
                     )}
                   </button>
                 </div>
-                <p className="text-sm text-gray-300 italic">
-                  "{clause.suggested_negotiation_script}"
-                </p>
+                  &quot;{clause.suggested_negotiation_script}&quot;
               </div>
 
             </div>

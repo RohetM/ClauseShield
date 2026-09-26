@@ -13,7 +13,8 @@ describe('Clause Risk Analysis & Schema Validation', () => {
       method: 'POST',
       body: JSON.stringify({ text })
     });
-    return await (await import('../src/app/api/analyze/route')).POST(req as any);
+    type RouteType = typeof import('../src/app/api/analyze/route');
+    return await (await import('../src/app/api/analyze/route')).POST(req as unknown as Parameters<RouteType['POST']>[0]);
   };
 
   test('Case 1: Standard Case (Normal, low-risk confidentiality clause)', async () => {
@@ -58,7 +59,7 @@ describe('Clause Risk Analysis & Schema Validation', () => {
   });
 
   test('Calculates overall risk score appropriately based on severe clauses', () => {
-    const criticals = mockContract.clauses.filter((c: any) => c.severity === 'CRITICAL');
+    const criticals = mockContract.clauses.filter((c: { severity: string }) => c.severity === 'CRITICAL');
     expect(criticals.length).toBeGreaterThan(0);
     expect(mockContract.overall_risk_score).toBeGreaterThan(7.0);
   });
