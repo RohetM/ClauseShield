@@ -1,0 +1,21 @@
+{
+  "contract_summary": "Reviewing independent contractor agreement.",
+  "overall_risk_score": 8.4,
+  "clauses": [
+    {
+      "clause_id": "clause_1",
+      "original_text": "Contractor grants Client perpetual, worldwide ownership of all IP created during or outside the contract period.",
+      "category": "INTELLECTUAL_PROPERTY",
+      "severity": "CRITICAL",
+      "risk_score": 9.5,
+      "asymmetry": {
+        "favors": "SECOND_PARTY",
+        "imbalance_explanation": "The clause grants ownership of IP created even outside the scope of work, which is highly predatory."
+      },
+      "plain_english_consequence": "You are giving away the rights to any ideas or work you create, even on your own time.",
+      "fair_counter_clause": "Ownership limited solely to agreed milestone deliverables.",
+      "suggested_negotiation_script": "I am happy to assign rights for the specific deliverables agreed upon, but I must retain ownership of IP created outside this contract."
+    }
+  ],
+  "unauthorized_practice_disclaimer": "ClauseShield assists with comprehension and is not certified legal representation."
+}
