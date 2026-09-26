@@ -1,26 +1,31 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import AnalysisConsole from '@/components/ui/AnalysisConsole';
 import RiskRadarOverview from '@/components/ui/RiskRadarOverview';
 import ClauseCard from '@/components/ui/ClauseCard';
-import LawyerDossierModal from '@/components/ui/LawyerDossierModal';
 import { useContractStream } from '@/lib/hooks/useContractStream';
 import { FileText, Download } from 'lucide-react';
 import { motion } from 'framer-motion';
+import dynamic from 'next/dynamic';
+
+const LawyerDossierModal = dynamic(() => import('@/components/ui/LawyerDossierModal'), {
+  ssr: false,
+  loading: () => null
+});
 
 export default function Home() {
   const { analyzeContract, isAnalyzing, clauses, metadata, error } = useContractStream();
   const [dossierOpen, setDossierOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'ALL' | 'CRITICAL' | 'ELEVATED' | 'STANDARD'>('ALL');
 
-  const filteredClauses = clauses.filter(c => {
+  const filteredClauses = useMemo(() => clauses.filter(c => {
     if (activeTab === 'ALL') return true;
     return c.severity === activeTab;
-  });
+  }), [clauses, activeTab]);
 
-  const criticalCount = clauses.filter(c => c.severity === 'CRITICAL').length;
-  const overallScore = metadata?.overall_risk_score || 0;
+  const criticalCount = useMemo(() => clauses.filter(c => c.severity === 'CRITICAL').length, [clauses]);
+  const overallScore = useMemo(() => metadata?.overall_risk_score || 0, [metadata]);
 
   return (
     <div className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 lg:p-8 flex flex-col md:flex-row gap-6">

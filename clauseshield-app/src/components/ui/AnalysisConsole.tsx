@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Send, FileText, AlertCircle } from 'lucide-react';
 import { announce } from '@/lib/a11y-announcer';
 
@@ -35,7 +35,15 @@ export default function AnalysisConsole({ onAnalyze, isAnalyzing }: AnalysisCons
     setText(e.target.value);
   };
 
-  const charCount = text.length;
+  const [debouncedText, setDebouncedText] = useState("");
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedText(text);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [text]);
+
+  const charCount = debouncedText.length;
   const isOverLimit = charCount > MAX_CHARS;
 
   return (

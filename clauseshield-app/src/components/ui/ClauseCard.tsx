@@ -1,17 +1,22 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronUp, AlertCircle, Copy, Scale } from 'lucide-react';
 import { ClauseAnalysisResult } from '@/lib/validation/clauseSchema';
-import MonacoDiffViewer from './MonacoDiffViewer';
+import dynamic from 'next/dynamic';
 import { announce } from '@/lib/a11y-announcer';
+
+const MonacoDiffViewer = dynamic(() => import('./MonacoDiffViewer'), {
+  ssr: false,
+  loading: () => <div className="h-64 bg-[#121214] animate-pulse rounded-md border border-gray-700" />
+});
 
 interface ClauseCardProps {
   clause: ClauseAnalysisResult;
 }
 
-export default function ClauseCard({ clause }: ClauseCardProps) {
+const ClauseCard = React.memo(function ClauseCard({ clause }: ClauseCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -28,12 +33,12 @@ export default function ClauseCard({ clause }: ClauseCardProps) {
     }
   };
 
-  const handleCopy = (text: string) => {
+  const handleCopy = useCallback((text: string) => {
     navigator.clipboard.writeText(text);
     setCopied(true);
     announce("Counter-clause copied to clipboard");
     setTimeout(() => setCopied(false), 2000);
-  };
+  }, []);
 
   return (
     <div className="bg-[#1C1C1F] border border-gray-800 rounded-xl overflow-hidden mb-4 shadow-sm transition-colors hover:border-gray-700">
@@ -121,4 +126,6 @@ export default function ClauseCard({ clause }: ClauseCardProps) {
       </AnimatePresence>
     </div>
   );
-}
+});
+
+export default ClauseCard;
