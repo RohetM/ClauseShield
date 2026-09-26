@@ -30,11 +30,17 @@ export const ClauseAnalysisResultSchema = z.object({
 
 export type ClauseAnalysisResult = z.infer<typeof ClauseAnalysisResultSchema>;
 
-export const ContractEvaluationResponseSchema = z.object({
-  contract_summary: z.string(),
-  overall_risk_score: z.number().min(1).max(100),
-  clauses: z.array(ClauseAnalysisResultSchema),
-  unauthorized_practice_disclaimer: z.string(),
+export const ContractAnalysisResponseSchema = z.object({
+  is_contractual: z.boolean().default(true),
+  edge_case_code: z.enum(["NON_LEGAL", "INCOMPLETE", "PROMPT_INJECTION", "NONE"]).default("NONE"),
+  contract_summary: z.string().optional(),
+  overall_risk_score: z.number().min(0).max(100).optional(),
+  clauses: z.array(ClauseAnalysisResultSchema).optional(),
+  unauthorized_practice_disclaimer: z.string().default("ClauseShield provides informational analysis and drafting assistance. It does not provide legal advice, determine enforceability, or replace a qualified attorney."),
 });
 
-export type ContractEvaluationResponse = z.infer<typeof ContractEvaluationResponseSchema>;
+export type ContractAnalysisResponse = z.infer<typeof ContractAnalysisResponseSchema>;
+
+export const AnalyzeRequestSchema = z.object({
+  text: z.string().min(1, "No text provided").max(15000, "Payload exceeds size limit"),
+});

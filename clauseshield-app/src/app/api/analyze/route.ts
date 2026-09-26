@@ -1,47 +1,29 @@
-import { NextRequest } from "next/server";
-import { analyzeContractMock } from "@/lib/ai/mockProvider";
-
-const MAX_PAYLOAD_CHARS = 15000;
+import { NextRequest, NextResponse } from "next/server";
+import { analyzeContractContent } from "@/lib/ai/provider";
+import { scrubPII } from "@/features/analyzer/piiScrubber";
+import { AnalyzeRequestSchema } from "@/lib/validation/clauseSchema";
 
 export async function POST(req: NextRequest) {
   try {
-    const { text } = await req.json();
-
-    if (!text || text.trim().length === 0) {
-      return new Response(JSON.stringify({ error: "No text provided" }), { status: 400 });
+    const body = await req.json();
+    
+    // Validate Input
+    const parseResult = AnalyzeRequestSchema.safeParse(body);
+    if (!parseResult.success) {
+      return NextResponse.json({ error: parseResult.error.errors[0].message }, { status: 400 });
     }
 
-    if (text.length > MAX_PAYLOAD_CHARS) {
-      return new Response(JSON.stringify({ error: "Payload exceeds size limit" }), { status: 413 });
-    }
+    const { text } = parseResult.data;
 
-    // Defensive isolation
-    const isolatedPayload = `<CONTRACT_PAYLOAD>\n${text}\n</CONTRACT_PAYLOAD>`;
+    // Scrub PII
+    const sanitizedText = scrubPII(text);
 
-    const encoder = new TextEncoder();
-    const stream = new ReadableStream({
-      async start(controller) {
-        try {
-          await analyzeContractMock(isolatedPayload, (chunk) => {
-            controller.enqueue(encoder.encode(`data: ${chunk}\n\n`));
-          });
-          controller.enqueue(encoder.encode(`data: [DONE]\n\n`));
-          controller.close();
-        } catch (err: any) {
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'error', data: err.message })}\n\n`));
-          controller.close();
-        }
-      }
-    });
+    // Call unified AI provider
+    const analysisResult = await analyzeContractContent(sanitizedText);
 
-    return new Response(stream, {
-      headers: {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-      },
-    });
-  } catch (err) {
-    return new Response(JSON.stringify({ error: "Internal Server Error" }), { status: 500 });
+    return NextResponse.json(analysisResult, { status: 200 });
+  } catch (err: any) {
+    console.error("Analysis route error:", err);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

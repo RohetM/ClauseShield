@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { ClauseAnalysisResult } from '../validation/clauseSchema';
+import { ClauseAnalysisResult, ContractAnalysisResponse } from '../validation/clauseSchema';
 
 export function useContractStream() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -20,52 +20,41 @@ export function useContractStream() {
         body: JSON.stringify({ text })
       });
 
+      const data: ContractAnalysisResponse = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to analyze contract');
+        throw new Error((data as any).error || 'Failed to analyze contract');
       }
 
-      const reader = response.body?.getReader();
-      if (!reader) throw new Error('No readable stream');
+      if (!data.is_contractual) {
+        if (data.edge_case_code === 'PROMPT_INJECTION') {
+          throw new Error('Malicious prompt injection detected. Request blocked.');
+        }
+        if (data.edge_case_code === 'NON_LEGAL') {
+          throw new Error('No contractual obligations detected. Please provide an operative agreement.');
+        }
+        if (data.edge_case_code === 'INCOMPLETE') {
+          throw new Error('Truncated input detected. Please provide complete clauses.');
+        }
+        throw new Error('Invalid or non-contractual payload.');
+      }
 
-      const decoder = new TextDecoder();
-      let buffer = '';
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n\n');
-        
-        buffer = lines.pop() || ''; // keep incomplete chunk in buffer
-
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const dataStr = line.slice(6);
-            if (dataStr === '[DONE]') {
-              setIsAnalyzing(false);
-              return;
-            }
-
-            try {
-              const parsed = JSON.parse(dataStr);
-              if (parsed.type === 'metadata') {
-                setMetadata(parsed.data);
-              } else if (parsed.type === 'clause') {
-                setClauses(prev => [...prev, parsed.data]);
-              } else if (parsed.type === 'error') {
-                throw new Error(parsed.data);
-              }
-            } catch (e: any) {
-              if (parsed?.type === 'error') throw e;
-              console.error('Error parsing SSE data', e);
-            }
-          }
+      setMetadata({
+        contract_summary: data.contract_summary,
+        overall_risk_score: data.overall_risk_score,
+        unauthorized_practice_disclaimer: data.unauthorized_practice_disclaimer
+      });
+      
+      // Simulate streaming for UX
+      if (data.clauses) {
+        for (let i = 0; i < data.clauses.length; i++) {
+          await new Promise(resolve => setTimeout(resolve, 500));
+          setClauses(prev => [...prev, data.clauses![i]]);
         }
       }
     } catch (err: any) {
       setError(err.message);
+    } finally {
       setIsAnalyzing(false);
     }
   }, []);
