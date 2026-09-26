@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { ClauseAnalysisResult } from '../types';
+import { ClauseAnalysisResult } from '../validation/clauseSchema';
 
 export function useContractStream() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -54,8 +54,11 @@ export function useContractStream() {
                 setMetadata(parsed.data);
               } else if (parsed.type === 'clause') {
                 setClauses(prev => [...prev, parsed.data]);
+              } else if (parsed.type === 'error') {
+                throw new Error(parsed.data);
               }
-            } catch (e) {
+            } catch (e: any) {
+              if (parsed?.type === 'error') throw e;
               console.error('Error parsing SSE data', e);
             }
           }

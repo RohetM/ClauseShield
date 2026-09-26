@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ReactNode } from "react";
-import LegalDisclaimerBar from "@/components/LegalDisclaimerBar";
+import LegalDisclaimerBar from "@/components/ui/LegalDisclaimerBar";
 
 const inter = Inter({ subsets: ["latin"] });
 

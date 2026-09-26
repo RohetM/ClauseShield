@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState } from 'react';
-import AnalysisConsole from '@/components/AnalysisConsole';
-import RiskRadarOverview from '@/components/RiskRadarOverview';
-import ClauseCard from '@/components/ClauseCard';
-import LawyerDossierModal from '@/components/LawyerDossierModal';
+import AnalysisConsole from '@/components/ui/AnalysisConsole';
+import RiskRadarOverview from '@/components/ui/RiskRadarOverview';
+import ClauseCard from '@/components/ui/ClauseCard';
+import LawyerDossierModal from '@/components/ui/LawyerDossierModal';
 import { useContractStream } from '@/lib/hooks/useContractStream';
 import { FileText, Download } from 'lucide-react';
 import { motion } from 'framer-motion';
