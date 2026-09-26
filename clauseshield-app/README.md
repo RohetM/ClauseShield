@@ -1,5 +1,7 @@
 # ClauseShield 🛡️
 
+**Live Demo:** [ClauseShield | AI Contract Risk Radar](https://clause-shield-indol.vercel.app/)
+
 **ClauseShield** is an AI-powered contract risk radar and real-time negotiation copilot designed to empower freelancers, tenants, and consumers facing dense, one-sided agreements.
 
 It parses contractual text, maps predatory liabilities using a semantic traffic-light risk engine, simulates real-world legal consequences, and dynamically synthesizes balanced counter-clauses with side-by-side redlines.
